@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Тут было • Память и Род</title>
+  <title>Тут было • Родовое древо и память мест</title>
   
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
@@ -15,6 +14,7 @@
       --brown-dark: #3E2723;
       --ochre: #C87D55;
       --card-bg: #FFFFFF;
+      --card-sibling-bg: #EFE6DC;
       --border-color: #D7C9BA;
     }
 
@@ -37,7 +37,7 @@
     header {
       background-color: var(--green-dark);
       color: var(--bg-cream);
-      padding: 14px 24px;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -46,163 +46,234 @@
     }
 
     header h1 {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       font-weight: 700;
     }
 
-    .main-container {
-      display: flex;
-      flex: 1;
-      height: calc(100vh - 55px);
+    /* Верхняя секция: Интерактивное древо поколений */
+    .tree-viewport {
+      height: 48vh;
+      background: #ECE2D5;
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+      overflow-y: auto;
+      padding: 24px 30px;
+      position: relative;
     }
 
-    /* Левая боковая панель */
-    .sidebar {
-      width: 420px;
-      min-width: 320px;
-      max-width: 480px;
-      border-right: 1px solid var(--border-color);
+    .tree-container {
       display: flex;
       flex-direction: column;
-      background: var(--bg-cream);
-      z-index: 10;
-    }
-
-    .tree-nav {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
-    }
-
-    .tree-nav h2 {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--green-dark);
-      margin-bottom: 10px;
-    }
-
-    .person-tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-
-    .person-tab-btn {
-      background: #E8DCCF;
-      border: 1px solid var(--border-color);
-      color: var(--brown-dark);
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .person-tab-btn.active {
-      background: var(--green-dark);
-      color: var(--bg-cream);
-      border-color: var(--green-dark);
-    }
-
-    .person-details {
-      padding: 20px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .person-header {
-      margin-bottom: 20px;
-    }
-
-    .person-header h2 {
-      color: var(--green-dark);
-      font-size: 1.4rem;
-      line-height: 1.2;
-    }
-
-    .person-header .years {
-      color: var(--ochre);
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-top: 4px;
-    }
-
-    .places-section h3 {
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--green-dark);
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
+      gap: 28px;
+      min-width: 900px;
       align-items: center;
     }
 
-    .btn-add-place {
-      background-color: var(--ochre);
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
+    .generation-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .generation-label {
+      position: absolute;
+      left: 10px;
       font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8C7B6D;
       font-weight: 600;
     }
 
-    .place-card {
+    .family-branch {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px dashed var(--border-color);
+    }
+
+    /* Крупные карточки: Прямая линия (Отец - Сын) */
+    .node-primary {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--ochre);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border: 2px solid var(--green-dark);
+      border-radius: 8px;
+      padding: 10px 14px;
+      min-width: 220px;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 10px rgba(45, 68, 54, 0.1);
+      transition: all 0.2s ease;
+      position: relative;
     }
 
-    .place-card:hover {
+    .node-primary:hover, .node-primary.active {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(62, 39, 35, 0.08);
+      border-color: var(--ochre);
+      box-shadow: 0 6px 14px rgba(200, 125, 85, 0.25);
     }
 
-    .place-type {
-      font-size: 0.75rem;
+    .node-primary.active::after {
+      content: '● Выбран';
+      position: absolute;
+      top: -9px;
+      right: 10px;
+      background: var(--ochre);
+      color: white;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .node-primary .role-badge {
+      font-size: 0.7rem;
+      font-weight: bold;
       text-transform: uppercase;
+      color: var(--green-dark);
+      margin-bottom: 2px;
+    }
+
+    .node-primary .name {
+      font-size: 1rem;
       font-weight: 700;
+      color: var(--brown-dark);
+    }
+
+    .node-primary .dates {
+      font-size: 0.8rem;
+      color: var(--ochre);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Меньшие карточки: Братья и сестры */
+    .siblings-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-left: 2px solid #C4B5A5;
+      padding-left: 12px;
+    }
+
+    .node-sibling {
+      background: var(--card-sibling-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 10px;
+      min-width: 140px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .node-sibling:hover, .node-sibling.active {
+      background: #FFFFFF;
+      border-color: var(--ochre);
+      transform: translateY(-1px);
+    }
+
+    .node-sibling.active {
+      border: 1.5px solid var(--ochre);
+    }
+
+    .node-sibling .role-badge {
+      font-size: 0.65rem;
+      color: #7A6858;
+      text-transform: uppercase;
+    }
+
+    .node-sibling .name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--brown-dark);
+    }
+
+    .node-sibling .dates {
+      font-size: 0.72rem;
+      color: #8C7B6D;
+    }
+
+    /* Нижняя секция: Места выбранного человека и Карта */
+    .bottom-workspace {
+      display: flex;
+      height: 52vh;
+    }
+
+    .person-places-panel {
+      width: 440px;
+      border-right: 1px solid var(--border-color);
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 18px 20px;
+      flex-shrink: 0;
+    }
+
+    .person-places-panel h2 {
+      font-size: 1.2rem;
       color: var(--green-dark);
       margin-bottom: 4px;
     }
 
-    .place-name {
-      font-weight: 700;
-      font-size: 1rem;
-      margin-bottom: 2px;
-      color: var(--brown-dark);
-    }
-
-    .place-years {
-      font-size: 0.8rem;
-      color: #7A6858;
-      margin-bottom: 8px;
-    }
-
-    .place-desc {
+    .person-places-panel .status-line {
       font-size: 0.85rem;
-      line-height: 1.45;
-      color: #4A3B32;
+      color: var(--ochre);
+      font-weight: 600;
+      margin-bottom: 14px;
     }
 
-    /* Правая панель: Карта */
-    .map-container {
+    .places-list h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--green-dark);
+      margin-bottom: 10px;
+    }
+
+    .place-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--ochre);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .place-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .place-box .type {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--green-dark);
+    }
+
+    .place-box .title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 2px 0;
+    }
+
+    .place-box .desc {
+      font-size: 0.8rem;
+      color: #5A4A3E;
+      line-height: 1.35;
+    }
+
+    .map-pane {
       flex: 1;
       height: 100%;
-      position: relative;
     }
 
     #map {
@@ -216,146 +287,296 @@
 
   <header>
     <h1>Тут было • Память и Род</h1>
-    <span style="font-size: 0.85rem; opacity: 0.9;">Геопривязка родовых мест</span>
+    <span style="font-size: 0.85rem; opacity: 0.9;">Древо поколений & Геопривязка мест</span>
   </header>
 
-  <div class="main-container">
-    <!-- Левая колонка -->
-    <aside class="sidebar">
-      <div class="tree-nav">
-        <h2>Поколения рода</h2>
-        <div class="person-tabs" id="personTabs"></div>
-      </div>
+  <!-- Интерактивное визуальное древо -->
+  <section class="tree-viewport">
+    <div class="tree-container" id="treeContainer">
+      <!-- Заполняется JavaScript с иерархией прямых предков и братьев/сестер -->
+    </div>
+  </section>
 
-      <div class="person-details" id="personDetails"></div>
+  <!-- Рабочее пространство: карточка мест + карта -->
+  <main class="bottom-workspace">
+    <aside class="person-places-panel" id="placesPanel">
+      <!-- Информация о выбранном предке и его культовых местах -->
     </aside>
-
-    <!-- Карта -->
-    <main class="map-container">
+    <section class="map-pane">
       <div id="map"></div>
-    </main>
-  </div>
+    </section>
+  </main>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    const familyData = [
+    // База данных рода (Ильичёвы) с разграничением на прямую линию и боковые ветви
+    const familyTreeData = [
       {
-        id: "person-1",
-        name: "Петр Степанович Ильичёв",
-        years: "1906 — 1941",
-        relation: "Прадед",
-        places: [
+        generation: "Поколение I",
+        primary: {
+          id: "vasily",
+          name: "Василий Тихонович Ильичёв",
+          role: "Прапрапрадед (Прямой предок)",
+          dates: "ок. 1840-е — до 1900",
+          places: [
+            {
+              type: "Родовой исток",
+              title: "Земля Ильичёвых (с. Красная Поляна)",
+              years: "Середина XIX века",
+              lat: 53.4900,
+              lng: 47.9500,
+              desc: "Сызранский уезд Симбирской губернии. Колыбель сельской ветви рода."
+            }
+          ]
+        },
+        siblings: [
           {
-            title: "Родовой очаг и усадьба",
-            type: "Родной дом",
-            years: "1906 — 1941",
-            lat: 53.4900,
-            lng: 47.9500,
-            city: "с. Красная Поляна",
-            description: "Земля и изба, откуда уходил на фронт. 40 соток земли, хозяйство."
-          },
-          {
-            title: "Мурманский рубеж (Заполярье)",
-            type: "Место памяти",
-            years: "Сентябрь 1941",
-            lat: 69.1800,
-            lng: 31.9500,
-            city: "р. Западная Лица",
-            description: "Рубеж обороны 112 стрелкового полка 52 сд. Точка воинской памяти."
+            id: "filipp",
+            name: "Филипп Тихонович",
+            role: "Брат (дядя рода)",
+            dates: "ок. 1850 — ?",
+            places: [
+              {
+                type: "Общинная земля",
+                title: "Двор Филиппа Тихоновича",
+                years: "1899",
+                lat: 53.4930,
+                lng: 47.9540,
+                desc: "Участник сельских сходов и поручитель на свадьбе племянницы Натальи."
+              }
+            ]
           }
         ]
       },
       {
-        id: "person-2",
-        name: "Михаил Захарович Мальков",
-        years: "1865 — 1930-е",
-        relation: "Прапрадед",
-        places: [
+        generation: "Поколение II",
+        primary: {
+          id: "stepan",
+          name: "Степан Васильевич Ильичёв",
+          role: "Прапрадед (Прямой предок)",
+          dates: "ок. 1863 — после 1910",
+          places: [
+            {
+              type: "Семейный двор",
+              title: "Усадьба Степана Васильевича",
+              years: "1884 — 1910-е",
+              lat: 53.4880,
+              lng: 47.9480,
+              desc: "Место брака с Екатериной Сергеевной и рождения сыновей."
+            },
+            {
+              type: "Приходской храм",
+              title: "Николаевская церковь",
+              years: "1890, 1906",
+              lat: 53.4850,
+              lng: 47.9520,
+              desc: "Место крещения детей и общественного поручительства."
+            }
+          ]
+        },
+        siblings: [
           {
-            title: "Вятский исток",
-            type: "Место рождения",
-            years: "1865",
-            lat: 57.3000,
-            lng: 48.9000,
-            city: "Кукарская волость (Яранский уезд)",
-            description: "Земля мастеровых предков до переселения на заводы."
+            id: "natalya",
+            name: "Наталья Васильевна",
+            role: "Сестра",
+            dates: "род. ок. 1877",
+            places: [
+              {
+                type: "Дом после замужества",
+                title: "д. Обуховка (Самаковы)",
+                years: "с 1899 года",
+                lat: 53.4400,
+                lng: 47.8800,
+                desc: "Венчание со Степаном Самаковым, переход в соседнюю деревню."
+              }
+            ]
           },
           {
-            title: "Золотые прииски и промыслы",
-            type: "Место труда",
-            years: "1890-е — 1910-е",
-            lat: 54.3700,
-            lng: 60.8100,
-            city: "пос. Пласт (Южный Урал)",
-            description: "Работа механиком на золотых приисках после перехода с Вятки."
+            id: "agrippina",
+            name: "Агриппина Васильевна",
+            role: "Сестра",
+            dates: "1880-е — ?",
+            places: [
+              {
+                type: "Крестильный очаг",
+                title: "с. Красная Поляна",
+                years: "1896",
+                lat: 53.4870,
+                lng: 47.9490,
+                desc: "Восприемница племянников в приходе."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        generation: "Поколение III",
+        primary: {
+          id: "petr",
+          name: "Пётр Степанович Ильичёв",
+          role: "Прадед (Прямой предок)",
+          dates: "05.10.1906 — 10.09.1941",
+          places: [
+            {
+              type: "Родной дом",
+              title: "Родовой очаг и хозяйство",
+              years: "1906 — 1941",
+              lat: 53.4900,
+              lng: 47.9500,
+              desc: "Изба, 40 соток земли, откуда ушел добровольцем на фронт."
+            },
+            {
+              type: "Место памяти и подвига",
+              title: "Мурманский рубеж (Заполярье)",
+              years: "Сентябрь 1941",
+              lat: 69.1800,
+              lng: 31.9500,
+              desc: "Оборона 112 стрелкового полка 52 сд у реки Западная Лица."
+            }
+          ]
+        },
+        siblings: [
+          {
+            id: "dmitriy",
+            name: "Димитрий Степанович",
+            role: "Старший брат",
+            dates: "род. 24.10.1890",
+            places: [
+              {
+                type: "Место рождения",
+                title: "Красная Поляна",
+                years: "1890",
+                lat: 53.4895,
+                lng: 47.9510,
+                desc: "Старший брат, поручитель на сельских свадьбах в 1907 году."
+              }
+            ]
+          },
+          {
+            id: "pavel",
+            name: "Павел Степанович",
+            role: "Брат",
+            dates: "род. 15.02.1902",
+            places: [
+              {
+                type: "Место рождения",
+                title: "с. Красная Поляна",
+                years: "1902",
+                lat: 53.4890,
+                lng: 47.9495,
+                desc: "Крещен при кумовьях Мавре Ильичёвой и Павле Плохове."
+              }
+            ]
           }
         ]
       }
     ];
 
-    const map = L.map('map').setView([55.0, 50.0], 5);
-
+    // Инициализация карты
+    const map = L.map('map').setView([53.5, 48.0], 7);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    let activeMarkers = [];
+    let currentMarkers = [];
+    let selectedPersonId = "petr";
 
-    const tabsContainer = document.getElementById('personTabs');
-    const detailsContainer = document.getElementById('personDetails');
+    // Построение древа
+    const treeContainer = document.getElementById('treeContainer');
 
-    function renderTabs() {
-      tabsContainer.innerHTML = '';
-      familyData.forEach((person, index) => {
-        const btn = document.createElement('button');
-        btn.className = `person-tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.textContent = person.name.split(' ')[0] + ' ' + person.name.split(' ')[1][0] + '.';
-        btn.onclick = () => selectPerson(person.id);
-        tabsContainer.appendChild(btn);
+    function renderTree() {
+      treeContainer.innerHTML = '';
+
+      familyTreeData.forEach(gen => {
+        const row = document.createElement('div');
+        row.className = 'generation-row';
+
+        const label = document.createElement('div');
+        label.className = 'generation-label';
+        label.textContent = gen.generation;
+        row.appendChild(label);
+
+        const branch = document.createElement('div');
+        branch.className = 'family-branch';
+
+        // 1. Крупная карточка прямого предка
+        const primaryNode = document.createElement('div');
+        primaryNode.className = `node-primary ${gen.primary.id === selectedPersonId ? 'active' : ''}`;
+        primaryNode.id = `node-${gen.primary.id}`;
+        primaryNode.innerHTML = `
+          <div class="role-badge">${gen.primary.role}</div>
+          <div class="name">${gen.primary.name}</div>
+          <div class="dates">${gen.primary.dates}</div>
+        `;
+        primaryNode.onclick = () => selectPerson(gen.primary);
+        branch.appendChild(primaryNode);
+
+        // 2. Компактная группа братьев и сестер
+        if (gen.siblings && gen.siblings.length > 0) {
+          const siblingsGroup = document.createElement('div');
+          siblingsGroup.className = 'siblings-group';
+
+          gen.siblings.forEach(sib => {
+            const sibNode = document.createElement('div');
+            sibNode.className = `node-sibling ${sib.id === selectedPersonId ? 'active' : ''}`;
+            sibNode.id = `node-${sib.id}`;
+            sibNode.innerHTML = `
+              <div class="role-badge">${sib.role}</div>
+              <div class="name">${sib.name}</div>
+              <div class="dates">${sib.dates}</div>
+            `;
+            sibNode.onclick = () => selectPerson(sib);
+            siblingsGroup.appendChild(sibNode);
+          });
+
+          branch.appendChild(siblingsGroup);
+        }
+
+        row.appendChild(branch);
+        treeContainer.appendChild(row);
       });
     }
 
-    function selectPerson(personId) {
-      document.querySelectorAll('.person-tab-btn').forEach((btn, idx) => {
-        btn.classList.toggle('active', familyData[idx].id === personId);
+    // Выбор персоны (прямого предка или брата/сестры)
+    function selectPerson(person) {
+      selectedPersonId = person.id;
+
+      // Снимаем класс active со всех и ставим выбранному
+      document.querySelectorAll('.node-primary, .node-sibling').forEach(el => {
+        el.classList.remove('active');
       });
+      const activeEl = document.getElementById(`node-${person.id}`);
+      if (activeEl) activeEl.classList.add('active');
 
-      const person = familyData.find(p => p.id === personId);
-      if (!person) return;
-
-      const placesHtml = person.places.map((place, idx) => `
-        <div class="place-card" onclick="zoomToPlace(${idx})">
-          <div class="place-type">${place.type} • ${place.city}</div>
-          <div class="place-name">${place.title}</div>
-          <div class="place-years">${place.years}</div>
-          <div class="place-desc">${place.description}</div>
+      // Обновляем панель мест слева
+      const panel = document.getElementById('placesPanel');
+      let placesHtml = person.places.map((place, idx) => `
+        <div class="place-box" onclick="focusPlace(${idx})">
+          <div class="type">${place.type} • ${place.years}</div>
+          <div class="title">${place.title}</div>
+          <div class="desc">${place.desc}</div>
         </div>
       `).join('');
 
-      detailsContainer.innerHTML = `
-        <div class="person-header">
-          <h2>${person.name}</h2>
-          <div class="years">${person.years} (${person.relation})</div>
-        </div>
-        <div class="places-section">
-          <h3>
-            Культовые места 
-            <button class="btn-add-place" onclick="alert('Форма добавления новой точки будет подключена на следующем этапе.')">+ Точка</button>
-          </h3>
+      panel.innerHTML = `
+        <h2>${person.name}</h2>
+        <div class="status-line">${person.role} • ${person.dates}</div>
+        <div class="places-list">
+          <h3>Культовые места и память (${person.places.length})</h3>
           ${placesHtml}
         </div>
       `;
 
-      activeMarkers.forEach(m => map.removeLayer(m));
-      activeMarkers = [];
+      // Перерисовываем маркеры на карте
+      currentMarkers.forEach(m => map.removeLayer(m));
+      currentMarkers = [];
 
       const bounds = [];
-      person.places.forEach((place) => {
-        const marker = L.circleMarker([place.lat, place.lng], {
-          radius: 8,
+      person.places.forEach((p) => {
+        const marker = L.circleMarker([p.lat, p.lng], {
+          radius: 9,
           fillColor: '#C87D55',
           color: '#2D4436',
           weight: 2,
@@ -363,26 +584,31 @@
           fillOpacity: 0.95
         }).addTo(map);
 
-        marker.bindPopup(`<b>${place.title}</b><br>${place.type}<br><i>${place.years}</i>`);
-        activeMarkers.push(marker);
-        bounds.push([place.lat, place.lng]);
+        marker.bindPopup(`<b>${p.title}</b><br><span style="color:#C87D55">${p.type}</span><br>${p.years}`);
+        currentMarkers.push(marker);
+        bounds.push([p.lat, p.lng]);
       });
 
-      if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 9 });
+      if (bounds.length === 1) {
+        map.setView(bounds[0], 9, { animate: true });
+      } else if (bounds.length > 1) {
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 8 });
       }
     }
 
-    window.zoomToPlace = function(index) {
-      const marker = activeMarkers[index];
+    window.focusPlace = function(index) {
+      const marker = currentMarkers[index];
       if (marker) {
         map.setView(marker.getLatLng(), 11, { animate: true });
         marker.openPopup();
       }
     };
 
-    renderTabs();
-    selectPerson(familyData[0].id);
+    // Стартовый запуск
+    renderTree();
+    // Выбираем по умолчанию Петра Степановича
+    const defaultPerson = familyTreeData[2].primary;
+    selectPerson(defaultPerson);
   </script>
 </body>
 </html>
