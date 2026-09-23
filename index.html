@@ -1,394 +1,388 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тут было • Память и Род</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    :root {
+      --bg-cream: #F4EBE1;
+      --green-dark: #2D4436;
+      --brown-dark: #3E2723;
+      --ochre: #C87D55;
+      --card-bg: #FFFFFF;
+      --border-color: #D7C9BA;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif;
+      background-color: var(--bg-cream);
+      color: var(--brown-dark);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background-color: var(--green-dark);
+      color: var(--bg-cream);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--ochre);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 55px);
+    }
+
+    /* Левая боковая панель */
+    .sidebar {
+      width: 420px;
+      min-width: 320px;
+      max-width: 480px;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-cream);
+      z-index: 10;
+    }
+
+    .tree-nav {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .tree-nav h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--green-dark);
+      margin-bottom: 10px;
+    }
+
+    .person-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .person-tab-btn {
+      background: #E8DCCF;
+      border: 1px solid var(--border-color);
+      color: var(--brown-dark);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .person-tab-btn.active {
+      background: var(--green-dark);
+      color: var(--bg-cream);
+      border-color: var(--green-dark);
+    }
+
+    .person-details {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .person-header {
+      margin-bottom: 20px;
+    }
+
+    .person-header h2 {
+      color: var(--green-dark);
+      font-size: 1.4rem;
+      line-height: 1.2;
+    }
+
+    .person-header .years {
+      color: var(--ochre);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .places-section h3 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--green-dark);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-add-place {
+      background-color: var(--ochre);
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .place-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--ochre);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .place-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(62, 39, 35, 0.08);
+    }
+
+    .place-type {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 4px;
+    }
+
+    .place-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 2px;
+      color: var(--brown-dark);
+    }
+
+    .place-years {
+      font-size: 0.8rem;
+      color: #7A6858;
+      margin-bottom: 8px;
+    }
+
+    .place-desc {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: #4A3B32;
+    }
+
+    /* Правая панель: Карта */
+    .map-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #EAE3D9;
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="ru"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Тут было — Семейная память и древо&lt;/title&gt;</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Leaflet CSS (Карта) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /&gt;</p>
-<p class="p2"><span class="Apple-converted-space">  </span></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--bg-cream: #F4EBE1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--green-dark: #2D4436;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--brown-dark: #3E2723;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--ochre: #C87D55;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--card-bg: #FFFFFF;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>--border-color: #D7C9BA;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>* {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-color: var(--bg-cream);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--brown-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>header {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--bg-cream);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 24px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 3px solid var(--ochre);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>header h1 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.25rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.5px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.main-container {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* Левая колонка: Древо и карточки */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.sidebar {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 420px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-right: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg-cream);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tree-nav {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-bottom: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-x: auto;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.tree-nav h2 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 1px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-tabs {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>gap: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-tab-btn {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #E8DCCF;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--brown-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 8px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: all 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-tab-btn.active {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--bg-cream);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-details {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-y: auto;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-header {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-header h2 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.4rem;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.person-header .years {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--ochre);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.95rem;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.places-section h3 {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.btn-add-place {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-color: var(--ochre);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 4px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 4px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.75rem;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-card {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: var(--card-bg);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border-color);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-left: 4px solid var(--ochre);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transition: transform 0.15s, box-shadow 0.15s;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-card:hover {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-2px);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 4px 10px rgba(0,0,0,0.06);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-type {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.75rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: var(--green-dark);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-name {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.95rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 4px 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-years {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>color: #7A6858;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>.place-desc {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.4;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* Правая колонка: Интерактивная карта */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.map-container {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>#map {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Тут было • Память и Род&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;span style="font-size: 0.85rem; opacity: 0.9;"&gt;Геопривязка родовых мест&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="main-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Левая панель: персоны и культовые места --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;aside class="sidebar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="tree-nav"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Поколения&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="person-tabs" id="personTabs"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="person-details" id="personDetails"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Заполняется динамически через JS --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/aside&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Правая панель: Карта --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;main class="map-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="map"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/main&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Leaflet JS --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Исходные данные (со структурой "Человек -&gt; Культовые места")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const familyData = [</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{</p>
-<p class="p1"><span class="Apple-converted-space">        </span>id: "person-1",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>name: "Петр Степанович Ильичёв",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>years: "1906 — 1941",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>relation: "Прадед",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>places: [</p>
-<p class="p1"><span class="Apple-converted-space">          </span>{</p>
-<p class="p1"><span class="Apple-converted-space">            </span>title: "Родовой очаг и усадьба",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>type: "Родной дом",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>years: "1906 — 1941",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lat: 53.4900,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lng: 47.9500,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>city: "с. Красная Поляна",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>description: "Земля и изба, откуда уходил на фронт. 40 соток земли, хозяйство."</p>
-<p class="p1"><span class="Apple-converted-space">          </span>},</p>
-<p class="p1"><span class="Apple-converted-space">          </span>{</p>
-<p class="p1"><span class="Apple-converted-space">            </span>title: "Мурманский фронт (Высота)",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>type: "Место памяти",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>years: "Сентябрь 1941",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lat: 69.1800,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lng: 31.9500,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>city: "р. Западная Лица",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>description: "Рубеж обороны 112 стрелкового полка 52 сд. Точка боевой памяти."</p>
-<p class="p1"><span class="Apple-converted-space">          </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>]</p>
-<p class="p1"><span class="Apple-converted-space">      </span>},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{</p>
-<p class="p1"><span class="Apple-converted-space">        </span>id: "person-2",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>name: "Михаил Захарович Мальков",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>years: "1865 — 1930-е",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>relation: "Прапрадед",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>places: [</p>
-<p class="p1"><span class="Apple-converted-space">          </span>{</p>
-<p class="p1"><span class="Apple-converted-space">            </span>title: "Вятский исток",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>type: "Место рождения",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>years: "1865",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lat: 57.3000,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lng: 48.9000,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>city: "Кукарская волость (Яранский уезд)",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>description: "Земля мастеровых предков до переселения на заводы."</p>
-<p class="p1"><span class="Apple-converted-space">          </span>},</p>
-<p class="p1"><span class="Apple-converted-space">          </span>{</p>
-<p class="p1"><span class="Apple-converted-space">            </span>title: "Золотые прииски и мастерские",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>type: "Место труда",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>years: "1890-е — 1910-е",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lat: 54.3700,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>lng: 60.8100,</p>
-<p class="p1"><span class="Apple-converted-space">            </span>city: "пос. Пласт (Южный Урал)",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>description: "Работа механиком на промыслах после перехода с Вятки."</p>
-<p class="p1"><span class="Apple-converted-space">          </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>]</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Инициализация карты</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const map = L.map('map').setView([55.0, 50.0], 5);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>maxZoom: 18,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>attribution: '© OpenStreetMap'</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}).addTo(map);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>let activeMarkers = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Рендер вкладок людей</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const tabsContainer = document.getElementById('personTabs');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const detailsContainer = document.getElementById('personDetails');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function renderTabs() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>tabsContainer.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>familyData.forEach((person, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const btn = document.createElement('button');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btn.className = `person-tab-btn ${index === 0 ? 'active' : ''}`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btn.textContent = person.name.split(' ')[0] + ' ' + person.name.split(' ')[1][0] + '.';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btn.onclick = () =&gt; selectPerson(person.id);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tabsContainer.appendChild(btn);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Выбор персоны и обновление карты</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function selectPerson(personId) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll('.person-tab-btn').forEach((btn, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btn.classList.toggle('active', familyData[idx].id === personId);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const person = familyData.find(p =&gt; p.id === personId);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (!person) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Обновляем карточку персоны слева</p>
-<p class="p1"><span class="Apple-converted-space">      </span>let placesHtml = person.places.map((place, idx) =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="place-card" onclick="zoomToPlace(${idx})"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="place-type"&gt;${place.type} • ${place.city}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="place-name"&gt;${place.title}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="place-years"&gt;${place.years}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="place-desc"&gt;${place.description}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`).join('');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>detailsContainer.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="person-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2&gt;${person.name}&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="years"&gt;${person.years} (${person.relation})&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="places-section"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Культовые места<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn-add-place" onclick="alert('Форма добавления точки появится на следующем шаге')"&gt;+ Точка&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>${placesHtml}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Чистим старые маркеры и добавляем новые</p>
-<p class="p1"><span class="Apple-converted-space">      </span>activeMarkers.forEach(m =&gt; map.removeLayer(m));</p>
-<p class="p1"><span class="Apple-converted-space">      </span>activeMarkers = [];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const bounds = [];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>person.places.forEach((place) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const marker = L.circleMarker([place.lat, place.lng], {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>radius: 8,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>fillColor: '#C87D55',</p>
-<p class="p1"><span class="Apple-converted-space">          </span>color: '#2D4436',</p>
-<p class="p1"><span class="Apple-converted-space">          </span>weight: 2,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>opacity: 1,</p>
-<p class="p1"><span class="Apple-converted-space">          </span>fillOpacity: 0.9</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}).addTo(map);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>marker.bindPopup(`&lt;b&gt;${place.title}&lt;/b&gt;&lt;br&gt;${place.type}&lt;br&gt;&lt;i&gt;${place.years}&lt;/i&gt;`);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>activeMarkers.push(marker);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>bounds.push([place.lat, place.lng]);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (bounds.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>map.fitBounds(bounds, { padding: [50, 50], maxZoom: 9 });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Приближение карты при клике на конкретное место</p>
-<p class="p1"><span class="Apple-converted-space">    </span>window.zoomToPlace = function(index) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const marker = activeMarkers[index];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (marker) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>map.setView(marker.getLatLng(), 11, { animate: true });</p>
-<p class="p1"><span class="Apple-converted-space">        </span>marker.openPopup();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Запуск</p>
-<p class="p1"><span class="Apple-converted-space">    </span>renderTabs();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>selectPerson(familyData[0].id);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+  <header>
+    <h1>Тут было • Память и Род</h1>
+    <span style="font-size: 0.85rem; opacity: 0.9;">Геопривязка родовых мест</span>
+  </header>
+
+  <div class="main-container">
+    <!-- Левая колонка -->
+    <aside class="sidebar">
+      <div class="tree-nav">
+        <h2>Поколения рода</h2>
+        <div class="person-tabs" id="personTabs"></div>
+      </div>
+
+      <div class="person-details" id="personDetails"></div>
+    </aside>
+
+    <!-- Карта -->
+    <main class="map-container">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    const familyData = [
+      {
+        id: "person-1",
+        name: "Петр Степанович Ильичёв",
+        years: "1906 — 1941",
+        relation: "Прадед",
+        places: [
+          {
+            title: "Родовой очаг и усадьба",
+            type: "Родной дом",
+            years: "1906 — 1941",
+            lat: 53.4900,
+            lng: 47.9500,
+            city: "с. Красная Поляна",
+            description: "Земля и изба, откуда уходил на фронт. 40 соток земли, хозяйство."
+          },
+          {
+            title: "Мурманский рубеж (Заполярье)",
+            type: "Место памяти",
+            years: "Сентябрь 1941",
+            lat: 69.1800,
+            lng: 31.9500,
+            city: "р. Западная Лица",
+            description: "Рубеж обороны 112 стрелкового полка 52 сд. Точка воинской памяти."
+          }
+        ]
+      },
+      {
+        id: "person-2",
+        name: "Михаил Захарович Мальков",
+        years: "1865 — 1930-е",
+        relation: "Прапрадед",
+        places: [
+          {
+            title: "Вятский исток",
+            type: "Место рождения",
+            years: "1865",
+            lat: 57.3000,
+            lng: 48.9000,
+            city: "Кукарская волость (Яранский уезд)",
+            description: "Земля мастеровых предков до переселения на заводы."
+          },
+          {
+            title: "Золотые прииски и промыслы",
+            type: "Место труда",
+            years: "1890-е — 1910-е",
+            lat: 54.3700,
+            lng: 60.8100,
+            city: "пос. Пласт (Южный Урал)",
+            description: "Работа механиком на золотых приисках после перехода с Вятки."
+          }
+        ]
+      }
+    ];
+
+    const map = L.map('map').setView([55.0, 50.0], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let activeMarkers = [];
+
+    const tabsContainer = document.getElementById('personTabs');
+    const detailsContainer = document.getElementById('personDetails');
+
+    function renderTabs() {
+      tabsContainer.innerHTML = '';
+      familyData.forEach((person, index) => {
+        const btn = document.createElement('button');
+        btn.className = `person-tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.textContent = person.name.split(' ')[0] + ' ' + person.name.split(' ')[1][0] + '.';
+        btn.onclick = () => selectPerson(person.id);
+        tabsContainer.appendChild(btn);
+      });
+    }
+
+    function selectPerson(personId) {
+      document.querySelectorAll('.person-tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', familyData[idx].id === personId);
+      });
+
+      const person = familyData.find(p => p.id === personId);
+      if (!person) return;
+
+      const placesHtml = person.places.map((place, idx) => `
+        <div class="place-card" onclick="zoomToPlace(${idx})">
+          <div class="place-type">${place.type} • ${place.city}</div>
+          <div class="place-name">${place.title}</div>
+          <div class="place-years">${place.years}</div>
+          <div class="place-desc">${place.description}</div>
+        </div>
+      `).join('');
+
+      detailsContainer.innerHTML = `
+        <div class="person-header">
+          <h2>${person.name}</h2>
+          <div class="years">${person.years} (${person.relation})</div>
+        </div>
+        <div class="places-section">
+          <h3>
+            Культовые места 
+            <button class="btn-add-place" onclick="alert('Форма добавления новой точки будет подключена на следующем этапе.')">+ Точка</button>
+          </h3>
+          ${placesHtml}
+        </div>
+      `;
+
+      activeMarkers.forEach(m => map.removeLayer(m));
+      activeMarkers = [];
+
+      const bounds = [];
+      person.places.forEach((place) => {
+        const marker = L.circleMarker([place.lat, place.lng], {
+          radius: 8,
+          fillColor: '#C87D55',
+          color: '#2D4436',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.95
+        }).addTo(map);
+
+        marker.bindPopup(`<b>${place.title}</b><br>${place.type}<br><i>${place.years}</i>`);
+        activeMarkers.push(marker);
+        bounds.push([place.lat, place.lng]);
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 9 });
+      }
+    }
+
+    window.zoomToPlace = function(index) {
+      const marker = activeMarkers[index];
+      if (marker) {
+        map.setView(marker.getLatLng(), 11, { animate: true });
+        marker.openPopup();
+      }
+    };
+
+    renderTabs();
+    selectPerson(familyData[0].id);
+  </script>
 </body>
 </html>
